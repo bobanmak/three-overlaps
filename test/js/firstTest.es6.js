@@ -3,6 +3,8 @@ import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "./WoodBox.js";
 import Grassground from "./Grassground.es.js";
 import { TransformControls  } from'../../node_modules/three/examples/jsm/controls/TransformControls.js';
+import { Overlaps  } from'../../src/three-overlaps.es.js';
+
 
 
 (function () {
@@ -12,6 +14,10 @@ import { TransformControls  } from'../../node_modules/three/examples/jsm/control
 
     VP.init();
     VP.start();
+
+    let test = new Overlaps();
+    let controls = [];
+    let objects  = [];
 
     VP.camera.position.z = 500;
 
@@ -52,16 +58,23 @@ import { TransformControls  } from'../../node_modules/three/examples/jsm/control
 
     function makeInteractive( mesh ){
 
-        let controls = new TransformControls( VP.camera, VP.renderer.domElement );
-        controls.attach( mesh );
+        objects.push( mesh );
 
-        controls.addEventListener( 'dragging-changed', function ( event ) {
-
-            VP.control.enabled = ! event.value;
-    
+        let ctr = new TransformControls( VP.camera, VP.renderer.domElement );
+       
+        ctr.attach( mesh );
+        
+        ctr.addEventListener( 'dragging-changed', function( e ){
+            VP.control.enabled = ! e.value 
         });
         
-        VP.scene.add( controls );
+        // on change position
+        ctr.addEventListener( 'change', function(){
+            test.testIntersect( mesh, objects ) 
+        });
+
+        controls.push( ctr );
+        VP.scene.add( ctr );
 
     }
 
