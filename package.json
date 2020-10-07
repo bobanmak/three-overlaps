@@ -1,22 +1,21 @@
 {
-  "name": "three-domevents",
+  "name": "three-overlaps",
   "version": "0.20.1005",
   "license": "MIT",
-  "description": "domevents for three.js",
-  "author": "i3ernie",
-  "repository": "https://github.com/i3ernie/three-domevents",
+  "description": "overlaps algorithms for three.js",
+  "author": "Boban",
+  "repository": "https://github.com/bobanmak/three-overlaps",
   "contributors": [],
   "keywords": [
     "three.js",
     "WebGL",
     "Viewport",
-    "Domevents"
+    "Overlapping"
   ],
   "dependencies": {
     "three": "^0.118"
   },
   "devDependencies": {
-    "jshint": "^2.11.1",
     "@rollup/plugin-alias": "latest",
     "@rollup/plugin-inject": "latest",
     "@rollup/plugin-replace": "latest",
@@ -27,6 +26,7 @@
     "gulp-rollup": "latest",
     "gulp-sourcemaps": "latest",
     "gulp-uglify": "latest",
+    "jshint": "^2.11.1",
     "lodash": "latest",
     "requirejs-babel": "git://github.com/mikach/requirejs-babel.git",
     "requirejs-plugins": "^1.0.2",
@@ -37,16 +37,12 @@
     "three-viewport": "git+https://github.com/i3ernie/three-viewport.git"
   },
   "directories": {
-    "example": "examples",
     "dist": "dist",
     "test": "test"
   },
   "files": [
     "LICENSE",
     "README.md",
-    "dist/domevents.es.js",
-    "dist/extdomevents.es.js",
-    "dist/domevents.amd.js",
     "package.json"
   ],
   "scripts": {

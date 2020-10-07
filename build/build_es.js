@@ -39,4 +39,4 @@ const build_overlapsES = function( done ){
     );
 };
 
-module.exports = build_three-overlapsES;
+module.exports = build_overlapsES;
