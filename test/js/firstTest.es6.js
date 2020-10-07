@@ -2,12 +2,12 @@ import * as THREE from '../../node_modules/three/build/three.module.js';
 import Viewport from "../../node_modules/three-viewport/dist/viewport.es.js";
 import WoodBox from "./WoodBox.js";
 import Grassground from "./Grassground.es.js";
+import { TransformControls  } from'../../node_modules/three/examples/jsm/controls/TransformControls.js';
 
 
 (function () {
     
     let VP;
-
     VP = new Viewport();
 
     VP.init();
@@ -29,12 +29,16 @@ import Grassground from "./Grassground.es.js";
     mesh1.position.set(-200, 50, 0);
 
     VP.scene.add( mesh1 );
+    makeInteractive( mesh1 );
 
-/*
-    let box = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),new THREE.MeshBasicMaterial({color:"yellow"}) );
-    box.name = "box_yellow_1.1";
-    box.position.set(0, 50, 0);
-    */
+    //box number two
+    let mesh2 = new WoodBox(110, 80, 65);
+    mesh2.name = "box_2";
+    mesh2.position.set(-300, 50, 0);
+
+    VP.scene.add( mesh2 );
+    makeInteractive( mesh2 );
+
 
    let ground = new Grassground({
         width		: 2000,
@@ -44,7 +48,26 @@ import Grassground from "./Grassground.es.js";
         "image" : "big"
     });
 
-    VP.scene.add( ground );
+    VP.scene.add( ground );   
+
+    function makeInteractive( mesh ){
+
+        let controls = new TransformControls( VP.camera, VP.renderer.domElement );
+        controls.attach( mesh );
+
+        controls.addEventListener( 'dragging-changed', function ( event ) {
+
+            VP.control.enabled = ! event.value;
+    
+        });
+        
+        VP.scene.add( controls );
+
+    }
+
    
 })();
+
+
+
 
