@@ -16,7 +16,16 @@ Object.assign( Overlaps.prototype, {
         });
 
         let res = this.testIntersectList( mesh, list );
-        console.log("Intersects: ", res);
+
+        /* test custom event
+        let eventName = res ? "Intersection" : "NoIntersection";
+        
+        mesh.intersection = function(){
+            this.dispatchEvent( "intersection"  );
+        };
+        */
+        
+        if ( res ) console.log("Intersects: ", res);
     },
 
     testIntersectList: function( mesh, list ){
