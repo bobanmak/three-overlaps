@@ -4,6 +4,8 @@ import * as THREE from '../node_modules/three/build/three.module.js';
 const Overlaps = function()
 {
     this.info = "Overlaps";
+    this.raycaster = new THREE.Raycaster();
+
 };
 
 Object.assign( Overlaps.prototype, {
@@ -55,6 +57,46 @@ Object.assign( Overlaps.prototype, {
         
         return false;
       
+    },
+
+    onGround: function( object, target ){
+        
+        let direction = new THREE.Vector3(0,-1,0);
+        let points =  this.getVerticesList( object );
+        let intersects = [];
+
+
+        for( let i = 0; i < points.length; i++){
+            this.raycaster.set( points[i], direction );
+            intersects = this.raycaster.intersectObject( target ) ;
+            if ( intersects.length === 0 ) return false;
+        }
+
+        console.log("inter: ", intersects);
+        return true;
+
+    },
+
+    getVerticesList: function( objMesh ){
+
+        objMesh.geometry.computeBoundingBox();
+        let boundingBox = objMesh.geometry.boundingBox.clone() ;
+
+        let width = Math.abs( boundingBox.max.x - boundingBox.min.x );
+        let depth = Math.abs( boundingBox.max.z - boundingBox.min.z );
+
+        let rotY = objMesh.rotation.y;
+        let c = Math.cos(rotY);
+        let s = Math.sin(rotY);
+        let c1 = Math.cos(rotY + Math.PI/2);
+        let s1 = Math.sin(rotY + Math.PI/2);
+
+        let p0 = new THREE.Vector3().copy( objMesh.position ); // left
+        let p1 = new THREE.Vector3( p0.x + width*s, p0.y, p0.z + depth*c ); // right
+        let p2 = new THREE.Vector3( p0.x + width*s1, p0.y, p0.z + depth*c1 ); // right down
+        let p3 = new THREE.Vector3( p1.x + width*s1, p1.y, p1.z + depth*c1 ); // left down
+
+        return [ p0, p1, p2, p3 ];
     }
 });
 
