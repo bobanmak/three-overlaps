@@ -69,10 +69,10 @@ Object.assign( Overlaps.prototype, {
         for( let i = 0; i < points.length; i++){
             this.raycaster.set( points[i], direction );
             intersects = this.raycaster.intersectObject( target ) ;
-            if ( intersects.length === 0 ) return false;
+            
+            if ( intersects.length === 0 )  return false;
         }
 
-        console.log("inter: ", intersects);
         return true;
 
     },
@@ -81,6 +81,7 @@ Object.assign( Overlaps.prototype, {
 
         objMesh.geometry.computeBoundingBox();
         let boundingBox = objMesh.geometry.boundingBox.clone() ;
+        let shiftY = 10;
 
         let width = Math.abs( boundingBox.max.x - boundingBox.min.x );
         let depth = Math.abs( boundingBox.max.z - boundingBox.min.z );
@@ -91,10 +92,10 @@ Object.assign( Overlaps.prototype, {
         let c1 = Math.cos(rotY + Math.PI/2);
         let s1 = Math.sin(rotY + Math.PI/2);
 
-        let p0 = new THREE.Vector3().copy( objMesh.position ); // left
-        let p1 = new THREE.Vector3( p0.x + width*s, p0.y, p0.z + depth*c ); // right
-        let p2 = new THREE.Vector3( p0.x + width*s1, p0.y, p0.z + depth*c1 ); // right down
-        let p3 = new THREE.Vector3( p1.x + width*s1, p1.y, p1.z + depth*c1 ); // left down
+        let p0 = new THREE.Vector3( objMesh.position.x, objMesh.position.y + shiftY, objMesh.position.z  ); // left
+        let p1 = new THREE.Vector3( p0.x + width*s , p0.y + shiftY, p0.z + depth*c ); // right
+        let p2 = new THREE.Vector3( p0.x + width*s1, p0.y + shiftY, p0.z + depth*c1 ); // right down
+        let p3 = new THREE.Vector3( p1.x + width*s1, p1.y + shiftY, p1.z + depth*c1 ); // left down
 
         return [ p0, p1, p2, p3 ];
     }
