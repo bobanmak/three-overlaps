@@ -41,7 +41,7 @@ Object.assign( PoolPosition.prototype, {
      * 
      * opts : axis-aligned, separating-axis, default: axis-aligned
      */
-    findFreeSpace: function( availableSpace, constraints, element, opts, scene ){
+    findFreeSpace: function( availableSpace, constraints, element, opts ){
 
         let freeSpaceFound = false;
         let newPositon;
@@ -54,9 +54,23 @@ Object.assign( PoolPosition.prototype, {
         }
         // Validation ends
           
-        if ( opts && opts.neighbour ){ }
+        if ( opts && opts.neighbour ){ 
+            // left, right
+            let v = this.getVertices( opts.neighbour );
+            
+            if ( opts.side && opts.side === "left" ){
+
+                let shiftAmmount = this.getMeshSize( element );
+
+                return this.shiftPosition( v[0], -shiftAmmount.width, element.rotation.y );
+            } 
+
+            return v[2]; // default right
+        }
         
-        else if ( opts && opts.entagled ){ }
+        else if ( opts && opts.entagled ){
+            // front, back
+        }
 
         else {
 
@@ -111,6 +125,30 @@ Object.assign( PoolPosition.prototype, {
 
     getVertices: function( mesh ) {
         return this.overlap.getVerticesList( mesh );
+    },
+
+    getMeshSize: function( objMesh ){
+        objMesh.geometry.computeBoundingBox();
+        let boundingBox = objMesh.geometry.boundingBox.clone() ;
+
+        let width = Math.abs( boundingBox.max.x - boundingBox.min.x );
+        let depth = Math.abs( boundingBox.max.z - boundingBox.min.z );
+
+        return { width, depth };
+    },
+
+    shiftPosition: function ( startVector, length, angle ) {
+
+        let c = Math.cos( angle );
+        let s = Math.sin( angle );
+
+        let result = [
+            startVector.x + c*length,
+            startVector.y,
+            startVector.z - s*length
+        ];
+
+        return new THREE.Vector3().fromArray( result );
     }
 
 
