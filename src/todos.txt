@@ -1,0 +1,9 @@
+To-Dos:
+
+- Hotspot ( Wünschecke ) as desired spot for the new placement
+- Tolerance - how close can it be placed 
+
+- Eine Liste mit Hotspots können definiert werden
+
+- Ergebnis als Objekt, nicht nur mit der Position sondern auch mit Erklärung oder ähnliches 
+- Liste mit Ergebnisse, nicht nur ein Ergebnis
