@@ -49,39 +49,39 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
 
     let box1 = createBox({ 
         size        : [500, 500, 500], 
-        position    : [-800, 0, 0],
+        position    : [-600, 0, 0],
         name: "box1" 
     });
 
     let box2 = createBox({ 
         size        : [400, 500, 500], 
         rotationY   : .63, 
-        position    : [-100, 0, -800],
+        position    : [-150, 0, -600],
         name: "box2" 
     });
 
+    /*
     let box3 = createBox({ 
         size        : [100, 500, 1500], 
         rotationY   : -.63, 
         position    : [-200, 0, -100],
         name: "box3"  
     });
-
+    */
     //makeInteractive( box3 );
 
-    constraints.push( box1, box2, box3 );
+    constraints.push( box1, box2 );
 
     let newBox = createBox({ 
         size        : [500, 500, 500], 
         name: "newBox"  
     });
 
-    let newPosition = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: box1, side: "left" } );
+    let newPosition = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: box1 } );
     newBox.position.copy( newPosition );
-    
 
     setTimeout( () =>{
-        let newPosition = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: box1, side: "right" } );
+        let newPosition = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: box1, side: "left"  } );
         newBox.position.copy( newPosition );
         if ( config.visualise ) visualiseVertices( Helper.getVertices( newBox ) );
 

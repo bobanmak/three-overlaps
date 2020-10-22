@@ -62,7 +62,7 @@ Object.assign( Overlaps.prototype, {
     onGround: function( object, target ){
         
         let direction = new THREE.Vector3(0,-1,0);
-        let points =  this.getVerticesList( object );
+        let points =  this.getVerticesList( object, { shiftY: 10} );
         let intersects = [];
 
 
@@ -77,11 +77,11 @@ Object.assign( Overlaps.prototype, {
 
     },
 
-    getVerticesList: function( objMesh ){
+    getVerticesList: function( objMesh, opts ){
 
         objMesh.geometry.computeBoundingBox();
         let boundingBox = objMesh.geometry.boundingBox.clone() ;
-        let shiftY = 10;
+        let shiftY = opts && opts.shiftY? opts.shiftY : 0;
 
         let width = Math.abs( boundingBox.max.x - boundingBox.min.x );
         let depth = Math.abs( boundingBox.max.z - boundingBox.min.z );
