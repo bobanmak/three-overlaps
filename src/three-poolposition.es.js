@@ -15,7 +15,8 @@ import { Overlaps  } from './three-overlaps.es.js';
 
 const defaults = {
 
-    poolPosition: new THREE.Vector3( 100, 0, 100 )
+    poolPosition: new THREE.Vector3( 100, 0, 100 ),
+    forceStop: 20
 
 };
 
@@ -24,6 +25,7 @@ const PoolPosition = function( opts )
     this.info = "Pool-Position";
     this.options = Object.assign( {}, defaults, opts );
     this.overlap = new Overlaps();
+    this.limit   = [];
 };
 
 Object.assign( PoolPosition.prototype, {
@@ -45,6 +47,8 @@ Object.assign( PoolPosition.prototype, {
 
         let freeSpaceFound = false;
         let newPositon;
+        let loops = 0;
+        this.limits = [];
 
         // Validation        
         if ( !availableSpace ) return this.options.poolPosition;
@@ -67,15 +71,16 @@ Object.assign( PoolPosition.prototype, {
 
             return v[2]; // default right
         }
-        
-        else if ( opts && opts.entagled ){
-            // front, back
-        }
-
+       
         else {
 
             // without rules or other limitation, random method
             while( !freeSpaceFound ){
+
+                if ( false && loops > defaults.forceStop ){
+                    console.log("loops: ", loops);
+                    freeSpaceFound = true;
+                } 
             
                 newPositon = this.generateRandomPosition( availableSpace );
 
@@ -83,11 +88,13 @@ Object.assign( PoolPosition.prototype, {
 
                 let onGround        = this.overlap.onGround( element, availableSpace );
                 let csIntersection  = this.overlap.testIntersectList( element, constraints );
-
+                loops++;
     
-                if ( !onGround || csIntersection  ){
+                if ( !onGround || csIntersection ){
                     continue;
                 } else {
+                    console.log("loops: ", loops);
+
                     freeSpaceFound = true;
                 }
 
@@ -99,21 +106,35 @@ Object.assign( PoolPosition.prototype, {
 
     },
 
-    generateRandomPosition: function( limit ){
-        // limit available space to the boundingBox
-       
-        limit.updateMatrixWorld();
-        limit.geometry.computeBoundingBox();
-        let boundingBox = limit.geometry.boundingBox.clone() ;
-        boundingBox.applyMatrix4( limit.matrixWorld );
+    generateRandomPosition: function( availableSpace ){
+        
+        // get limit of the available space
+        let limits = this.limits.length === 0 ? this.getLimits( availableSpace ) : this.limits;   
 
-
-        let x = [ boundingBox.min.x, boundingBox.max.x ];
-        let z = [ boundingBox.min.z, boundingBox.max.z ];
-
-
-        return new THREE.Vector3( this.getRndInteger(x), 0, this.getRndInteger(z));
+        return new THREE.Vector3( this.getRndInteger( limits[0].x ), 0, this.getRndInteger( limits[0].z ) );
     
+    },
+
+    getLimits: function( availableSpace ){
+        // limit available space to the boundingBox
+        let boundingBox;
+        let limits = [];
+       
+        availableSpace.updateMatrixWorld();
+        availableSpace.geometry.computeBoundingBox();
+        
+        boundingBox = availableSpace.geometry.boundingBox.clone() ;
+        boundingBox.applyMatrix4( availableSpace.matrixWorld );
+
+        limits.push({
+            x: [ boundingBox.min.x, boundingBox.max.x ],
+            z: [ boundingBox.min.z, boundingBox.max.z ]
+        });
+           
+        this.limits = limits;
+            
+        return limits;
+
     },
 
     getRndInteger: function( arr ) {
