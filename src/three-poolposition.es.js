@@ -16,7 +16,7 @@ import { Overlaps  } from './three-overlaps.es.js';
 const defaults = {
 
     poolPosition: new THREE.Vector3( 100, 0, 100 ),
-    forceStop: 20
+    forceStop: 200
 
 };
 
@@ -45,10 +45,12 @@ Object.assign( PoolPosition.prototype, {
      */
     findFreeSpace: function( availableSpace, constraints, element, opts ){
 
-        let freeSpaceFound = false;
-        let newPositon;
+        let scope = this;
+        let newPosition;
         let loops = 0;
+        let isValid = false;
         this.limits = [];
+
 
         // Validation        
         if ( !availableSpace ) return this.options.poolPosition;
@@ -61,49 +63,59 @@ Object.assign( PoolPosition.prototype, {
         if ( opts && opts.neighbour ){ 
             // left, right
             let v = this.getVertices( opts.neighbour );
+            newPosition = new THREE.Vector3(v[2].x+.5, v[2].y , v[2].z)  ; // default right vertices
             
-            if ( opts.side && opts.side === "left" ){
+            isValid = this.hasValidPosition( element, newPosition, availableSpace, constraints );
+            
+            if ( opts.side === "left" || !isValid ){
 
                 let shiftAmmount = this.getMeshSize( element );
+                newPosition      = this.shiftPosition( new THREE.Vector3(v[0].x-.5, v[0].y , v[0].z), -shiftAmmount.width, element.rotation.y ); // left vertices shifted on bbox width
+        
+                isValid = this.hasValidPosition( element, newPosition, availableSpace, constraints );
 
-                return this.shiftPosition( v[0], -shiftAmmount.width, element.rotation.y );
+                recursiveSearch();
+
+                // test bounce back - newPositon = this.shiftPosition( v[0], shift, element.rotation.y ); // left vertices shifted on bbox width
+            
             } 
 
-            return v[2]; // default right
+            return newPosition; 
         }
        
         else {
+            recursiveSearch();
+        }
 
-            // without rules or other limitation, random method
-            while( !freeSpaceFound ){
-
-                if ( false && loops > defaults.forceStop ){
-                    console.log("loops: ", loops);
-                    freeSpaceFound = true;
-                } 
+        function recursiveSearch(){
+            while( !isValid ){
+                
+                if ( loops > defaults.forceStop){
+                    newPosition = null; 
+                    break;
+                }
             
-                newPositon = this.generateRandomPosition( availableSpace );
-
-                element.position.copy( newPositon );
-
-                let onGround        = this.overlap.onGround( element, availableSpace );
-                let csIntersection  = this.overlap.testIntersectList( element, constraints );
+                newPosition = scope.generateRandomPosition( availableSpace );
+                isValid     = scope.hasValidPosition( element, newPosition, availableSpace, constraints );
+                
                 loops++;
     
-                if ( !onGround || csIntersection ){
-                    continue;
-                } else {
-                    console.log("loops: ", loops);
-
-                    freeSpaceFound = true;
-                }
-
-                 
+                if ( !isValid ) continue;
             }
         }
 
-        return newPositon;
+        return newPosition;
 
+    },
+
+    hasValidPosition: function ( element, newPosition, availableSpace, constraints ) {
+       
+        element.position.copy( newPosition );
+
+        let onGround        = this.overlap.onGround( element, availableSpace );
+        let csIntersection  = this.overlap.testIntersectList( element, constraints );
+
+        return onGround && !csIntersection;
     },
 
     generateRandomPosition: function( availableSpace ){
