@@ -37,7 +37,7 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
     let p, mesh, lastInserted;
     
     // available space
-    let ground = new Grassground({
+    let availableSpace = new Grassground({
         width		: 2500,
         height		: 2500,
         repeatX		: 10,
@@ -45,7 +45,7 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
         "image" : "big"
     });
 
-    VP.scene.add( ground );
+    VP.scene.add( availableSpace );
 
     let box1 = createBox({ 
         size        : [300, 300, 300], 
@@ -57,26 +57,30 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
     lastInserted = box1;
 
     let fillSpace = setInterval( ()=>{
-        //console.log("lastInserted; ", lastInserted );
+
         let newBox = createBox({ 
             size        : [300, 300, 300], 
             name: "newBox"  
         });
 
-        let freeSpace = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: lastInserted } );
-        console.log( freeSpace );
-        if ( !freeSpace.position ) {
+        let res = Helper.findFreeSpace( availableSpace, constraints, newBox, { neighbour: lastInserted,  side:  "left"  } );
+        // liste : side: [ "left", "right" ] } ); als Liste mit Anweisungen
+        
+        console.log( res );
+        
+        if ( !res.position ) {
             VP.scene.remove( mesh );
-            clearInterval(fillSpace);
+            clearInterval( fillSpace );
+            return;
         } 
-        else{
-            newBox.position.copy( freeSpace.position );
-            constraints.push( newBox );
-            lastInserted = newBox;
+       
+        newBox.position.copy( res.position );
+        constraints.push( newBox );
+        lastInserted = newBox;
 
-            if ( config.visualise ) visualiseVertices( Helper.getVertices( newBox ) );
-        }
-
+        if ( config.visualise ) visualiseVertices( Helper.getVertices( newBox ) );
+        
+       // clearInterval( fillSpace );
         
     }, 1000 );
 

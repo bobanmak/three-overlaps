@@ -1,12 +1,16 @@
 To-Dos:
 
+( random search )
 - Hotspot ( Wünschecke ) as desired spot for the new placement
 - Tolerance - how close can it be placed 
-
 - Eine Liste mit Hotspots können definiert werden
 
+( allgemein )
 - Ergebnis als Objekt, nicht nur mit der Position sondern auch mit Erklärung oder ähnliches 
+    ( zur Zeit als Objekt mit Position und Source )
 - Liste mit Ergebnisse, nicht nur ein Ergebnis
 
+( input )
+- side: left, right, back, front, top, bottom 
+- Ausrichtung per default 0, optional ( 0, 90, 180, 270 )
 
-test commit
