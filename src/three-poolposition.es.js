@@ -16,6 +16,7 @@ import { Overlaps  } from './three-overlaps.es.js';
 const defaults = {
 
     poolPosition: new THREE.Vector3( 100, 0, 100 ),
+    poolRotation: new THREE.Euler( 0, 0, 0 ),
     forceStop: 200
 
 };
@@ -45,66 +46,79 @@ Object.assign( PoolPosition.prototype, {
      */
     findFreeSpace: function( availableSpace, constraints, element, opts ){
 
+        // Gives Object back
+
         let scope = this;
-        let newPosition;
         let loops = 0;
         let isValid = false;
         this.limits = [];
 
+        let res = {} ;
+
+
 
         // Validation        
-        if ( !availableSpace ) return this.options.poolPosition;
+        if ( !availableSpace ) {
+              return {
+                position: this.options.poolPosition,
+                source: "default_values"
+            }
+        };
+
         if ( !element ){
             console.error( "The Element is not defined!", element );
             return;
         }
-        // Validation ends
           
         if ( opts && opts.neighbour ){ 
-            // left, right
+
             let v = this.getVertices( opts.neighbour );
-            newPosition = new THREE.Vector3(v[2].x+.5, v[2].y , v[2].z)  ; // default right vertices
             
-            isValid = this.hasValidPosition( element, newPosition, availableSpace, constraints );
+            res.source    = "neighbour_right";
+            res.position  = new THREE.Vector3(v[2].x+.5, v[2].y , v[2].z)  ; // default right vertice 
+            
+            isValid = this.hasValidPosition( element, res.position, availableSpace, constraints );
             
             if ( opts.side === "left" || !isValid ){
+                
+                res.source = "neighbour_left";
 
                 let shiftAmmount = this.getMeshSize( element );
-                newPosition      = this.shiftPosition( new THREE.Vector3(v[0].x-.5, v[0].y , v[0].z), -shiftAmmount.width, element.rotation.y ); // left vertices shifted on bbox width
+                res.position     = this.shiftPosition( new THREE.Vector3(v[0].x-.5, v[0].y , v[0].z), -shiftAmmount.width, element.rotation.y ); // left vertices shifted on bbox width
         
-                isValid = this.hasValidPosition( element, newPosition, availableSpace, constraints );
-
-                recursiveSearch();
+                isValid = this.hasValidPosition( element, res.position, availableSpace, constraints );
+                if ( !isValid ) recursiveSearch();
 
                 // test bounce back - newPositon = this.shiftPosition( v[0], shift, element.rotation.y ); // left vertices shifted on bbox width
             
             } 
 
-            return newPosition; 
+            return res;
         }
        
         else {
             recursiveSearch();
+            return res;
         }
 
         function recursiveSearch(){
+            res.source = "random_search";
+    
             while( !isValid ){
                 
                 if ( loops > defaults.forceStop){
-                    newPosition = null; 
+                    res.source = "random_search_stopped";
+                    res.position = null; 
                     break;
                 }
             
-                newPosition = scope.generateRandomPosition( availableSpace );
-                isValid     = scope.hasValidPosition( element, newPosition, availableSpace, constraints );
+                res.position = scope.generateRandomPosition( availableSpace );
+                isValid      = scope.hasValidPosition( element,  res.position, availableSpace, constraints );
                 
                 loops++;
-    
                 if ( !isValid ) continue;
             }
         }
-
-        return newPosition;
 
     },
 

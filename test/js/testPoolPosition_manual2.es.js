@@ -63,13 +63,14 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
             name: "newBox"  
         });
 
-        let newPosition = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: lastInserted } );
-        if ( !newPosition ) {
+        let freeSpace = Helper.findFreeSpace( ground, constraints, newBox, { neighbour: lastInserted } );
+        console.log( freeSpace );
+        if ( !freeSpace.position ) {
             VP.scene.remove( mesh );
             clearInterval(fillSpace);
         } 
         else{
-            newBox.position.copy( newPosition );
+            newBox.position.copy( freeSpace.position );
             constraints.push( newBox );
             lastInserted = newBox;
 
@@ -77,7 +78,7 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
         }
 
         
-    }, 100 );
+    }, 1000 );
 
     
 
