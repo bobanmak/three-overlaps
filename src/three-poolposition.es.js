@@ -73,14 +73,21 @@ Object.assign( PoolPosition.prototype, {
         if ( opts && opts.neighbour ){
             
             // check right, check left and check monteCarlo
+            let pi = 3.14;
 
             let v = this.getVertices( opts.neighbour );
             
             res.source    = "neighbour_right";
             res.position  = new THREE.Vector3(v[2].x+.5, v[2].y , v[2].z)  ; // default right vertice 
-            res.rotationY = 1.54;
+            res.rotationY = 2*pi;
             isValid = this.hasValidPosition( element, res.position, availableSpace, constraints );
             
+            // Ausrichtung 
+
+            // pi/2      | pivotpunkt nach unten um die Tiefe
+            // pi + pi/2 | pivotpunkt nach rechts um die Breite
+            // pi        | pivotpunkt nach rechts um die Breite und nach unten um die Tiefe
+
             if ( opts.side === "left" || !isValid ){
                 
                 res.source = "neighbour_left";
@@ -91,8 +98,6 @@ Object.assign( PoolPosition.prototype, {
                 isValid = this.hasValidPosition( element, res.position, availableSpace, constraints );
                 if ( !isValid ) recursiveSearch();
 
-                // test bounce back - newPositon = this.shiftPosition( v[0], shift, element.rotation.y ); // left vertices shifted on bbox width
-            
             } 
 
             if ( opts.side === "top" ){
@@ -101,10 +106,6 @@ Object.assign( PoolPosition.prototype, {
 
                 let shiftAmmount = this.getMeshSize( opts.neighbour );
                 res.position     = new THREE.Vector3(v[0].x, v[0].y +shiftAmmount.height , v[0].z) 
-        
-                
-
-                // test bounce back - newPositon = this.shiftPosition( v[0], shift, element.rotation.y ); // left vertices shifted on bbox width
             
             } 
 
