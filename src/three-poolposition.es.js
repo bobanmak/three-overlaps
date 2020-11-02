@@ -16,7 +16,7 @@ import { Overlaps  } from './three-overlaps.es.js';
 const defaults = {
 
     poolPosition: new THREE.Vector3( 100, 0, 100 ),
-    poolRotation: new THREE.Euler( 0, 0, 0 ),
+    poolRotation: new THREE.Euler( 0, 45, 0 ),
     forceStop: 200
 
 };
@@ -70,13 +70,15 @@ Object.assign( PoolPosition.prototype, {
             return;
         }
           
-        if ( opts && opts.neighbour ){ 
+        if ( opts && opts.neighbour ){
+            
+            // check right, check left and check monteCarlo
 
             let v = this.getVertices( opts.neighbour );
             
             res.source    = "neighbour_right";
             res.position  = new THREE.Vector3(v[2].x+.5, v[2].y , v[2].z)  ; // default right vertice 
-            
+            res.rotationY = 1.54;
             isValid = this.hasValidPosition( element, res.position, availableSpace, constraints );
             
             if ( opts.side === "left" || !isValid ){
@@ -88,6 +90,19 @@ Object.assign( PoolPosition.prototype, {
         
                 isValid = this.hasValidPosition( element, res.position, availableSpace, constraints );
                 if ( !isValid ) recursiveSearch();
+
+                // test bounce back - newPositon = this.shiftPosition( v[0], shift, element.rotation.y ); // left vertices shifted on bbox width
+            
+            } 
+
+            if ( opts.side === "top" ){
+                
+                res.source = "neighbour_top";
+
+                let shiftAmmount = this.getMeshSize( opts.neighbour );
+                res.position     = new THREE.Vector3(v[0].x, v[0].y +shiftAmmount.height , v[0].z) 
+        
+                
 
                 // test bounce back - newPositon = this.shiftPosition( v[0], shift, element.rotation.y ); // left vertices shifted on bbox width
             
@@ -180,8 +195,9 @@ Object.assign( PoolPosition.prototype, {
 
         let width = Math.abs( boundingBox.max.x - boundingBox.min.x );
         let depth = Math.abs( boundingBox.max.z - boundingBox.min.z );
+        let height = Math.abs( boundingBox.max.y - boundingBox.min.y );
 
-        return { width, depth };
+        return { width, depth, height };
     },
 
     shiftPosition: function ( startVector, length, angle ) {

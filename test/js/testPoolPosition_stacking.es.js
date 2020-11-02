@@ -49,7 +49,7 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
 
     let box1 = createBox({ 
         size        : [300, 300, 300], 
-        position    : [450, 0, 0],
+        position    : [650, 0, 0],
         name: "box1" 
     });
 
@@ -59,14 +59,14 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
     let fillSpace = setInterval( ()=>{
 
         let newBox = createBox({ 
-            size        : [300, 300, 300], 
+            size        : [80, 80, 80], 
             name: "newBox"  
         });
 
-        let res = Helper.findFreeSpace( availableSpace, constraints, newBox, { neighbour: lastInserted } );
+        let res = Helper.findFreeSpace( availableSpace, constraints, newBox, { neighbour: lastInserted , side: "top" } );
         // liste : side: [ "left", "right" ] } ); als Liste mit Anweisungen
         
-        console.log( res, newBox );
+        console.log( res );
         
         if ( !res.position ) {
             VP.scene.remove( mesh );
@@ -74,14 +74,13 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
             return;
         } 
        
-        newBox.rotation.y =  res.rotationY ;
         newBox.position.copy( res.position );
         constraints.push( newBox );
         lastInserted = newBox;
 
         if ( config.visualise ) visualiseVertices( Helper.getVertices( newBox ) );
         
-        clearInterval( fillSpace );
+       // clearInterval( fillSpace );
         
     }, 1000 );
 
@@ -96,8 +95,8 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
     
     function visualiseVertices( list ){ 
         // add cubes on List of Points
-
-        list = [ list[0] ];
+        list = [ list[0]];
+console.log("list: ", list);
         let deletable = VP.scene.getObjectByName( "deletable" );
 
         if ( typeof deletable === "undefined" ){
@@ -111,7 +110,7 @@ import { PoolPosition  } from'../../src/three-poolposition.es.js';
             deletable.remove(deletable.children[i]);
         }
 
-        let geometry = new THREE.BoxGeometry( 15, 15, 15 );
+        let geometry = new THREE.BoxGeometry( 10, 10, 10 );
         let material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
 
         for ( let i= 0; i < list.length ; i++ ){
